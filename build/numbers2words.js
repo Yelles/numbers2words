@@ -1604,7 +1604,7 @@ T2W.NL_NL.DICTIONARY = {
     teens           : ["tien", "elf", "twaalf", "dertien", "veertien", "vijftien", "zestien", "zeventien", "achttien", "negentien"],
     tens            : ["", "", "twintig", "dertig", "veertig", "vijftig", "zestig", "zeventig", "tachtig", "negentig"],
     hundred         : "honderd",
-    radix           : ["", "duizend", ["miljoen", "miljoen"]],
+    radix           : ["", "duizend", "miljoen"],
     delimiters      : ["", "en"]
 };
 
@@ -1684,12 +1684,8 @@ T2W.NL_NL.prototype._getTrio = function( numbers, index, max){
     
     if( numbers[ T2W.TEN_INDEX ] >= 2 ){
         if(numbers[T2W.SINGLE_INDEX]){
-            // En néerlandais: "drieëntwintig" (23 = trois-et-vingt)
-            if(numbers[T2W.SINGLE_INDEX] === 3 && numbers[T2W.TEN_INDEX] >= 2){
-                ten = "drie" + T2W.NL_NL.DICTIONARY.delimiters[1] + this._getTens( numbers[T2W.TEN_INDEX]);
-            } else {
-                ten = this._getOnes( numbers[T2W.SINGLE_INDEX] ) + T2W.NL_NL.DICTIONARY.delimiters[1] + this._getTens( numbers[T2W.TEN_INDEX]);
-            }
+            // En néerlandais: "drieëntwintig" -> "drieentwintig" (sans ë pour simplifier)
+            ten = this._getOnes( numbers[T2W.SINGLE_INDEX] ) + T2W.NL_NL.DICTIONARY.delimiters[1] + this._getTens( numbers[T2W.TEN_INDEX]);
         } else {
             ten = this._getTens( numbers[T2W.TEN_INDEX]);
         }
@@ -1699,20 +1695,30 @@ T2W.NL_NL.prototype._getTrio = function( numbers, index, max){
         single = this._getOnes( numbers[T2W.SINGLE_INDEX]);
     }
     
-    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
-        hundred = ' ' + hundred;
-    }
-    
-    if( index === 0 && index+1 < max && !numbers[ T2W.HUNDRED_INDEX ] && (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX] )){
-        hundred = ' ';
-    }
+    var result = hundred + ten + single + radix;
     
     // Cas spécial pour "duizend" (un mille = duizend, pas "een duizend")
     if( index === 1 && numbers[T2W.TEN_INDEX] === undefined && numbers[T2W.SINGLE_INDEX] === 1 && !numbers[T2W.HUNDRED_INDEX] ){
         return radix;
     }
     
-    return hundred + ten + single + radix;
+    // En néerlandais : logique spéciale pour les espaces
+    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
+        if( index === 0 ){
+            // Unités : espace avant seulement si pas milliers directs
+            result = ' ' + result;
+        } else if( index === 1 ){
+            // Milliers : espace avant SEULEMENT s'il y a des millions
+            if( max > 2 ){
+                result = ' ' + result;
+            }
+        } else if( index === 2 ){
+            // Millions : espace avant
+            result = ' ' + result;
+        }
+    }
+    
+    return result;
 };
 
 /**
@@ -1761,12 +1767,13 @@ T2W.NL_NL.prototype._getRadix = function( numbers, index ) {
     
     if( index > 0 && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX])){
         if( index === 1 ){
-            radix = ' ' + T2W.NL_NL.DICTIONARY.radix[index];
+            // Milliers : pas d'espace avant "duizend"
+            radix = T2W.NL_NL.DICTIONARY.radix[ index ];
         }
         
         if( index === 2 ){
-            // En néerlandais, "miljoen" ne change pas au pluriel dans ce contexte
-            radix = ' ' + T2W.NL_NL.DICTIONARY.radix[index][0];
+            // Millions : espace avant "miljoen" 
+            radix = ' ' + T2W.NL_NL.DICTIONARY.radix[index];
         }
     }
     
@@ -1856,13 +1863,15 @@ T2W.PT_BR.prototype._getTrio = function( numbers, index, max){
         if(numbers[T2W.HUNDRED_INDEX] === 1){
             // 100 = "cem", 101-199 = "cento"
             hundred = (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) 
-                ? T2W.PT_BR.DICTIONARY.hundred[1] + ' '  // "cento "
-                : T2W.PT_BR.DICTIONARY.hundred[0];       // "cem"
+                ? T2W.PT_BR.DICTIONARY.hundred[1]  // "cento"
+                : T2W.PT_BR.DICTIONARY.hundred[0]; // "cem"
         } else {
             hundred = this._getOnes( numbers[T2W.HUNDRED_INDEX], index, false ) + ' ' + T2W.PT_BR.DICTIONARY.hundred[1];
-            if(numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]){
-                hundred += ' ';
-            }
+        }
+        
+        // Ajouter "e" après les centaines si il y a des dizaines ou unités
+        if(numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]){
+            hundred += ' e ';
         }
     }
     
@@ -1872,7 +1881,7 @@ T2W.PT_BR.prototype._getTrio = function( numbers, index, max){
     
     if( numbers[ T2W.TEN_INDEX ] >= 2 ){
         ten = numbers[T2W.SINGLE_INDEX] 
-            ? this._getTens( numbers[T2W.TEN_INDEX]) + T2W.PT_BR.DICTIONARY.delimiters[0] + this._getOnes( numbers[T2W.SINGLE_INDEX], index, true) 
+            ? this._getTens( numbers[T2W.TEN_INDEX]) + ' e ' + this._getOnes( numbers[T2W.SINGLE_INDEX], index, true) 
             : this._getTens( numbers[T2W.TEN_INDEX]);
     }
     
@@ -1880,20 +1889,41 @@ T2W.PT_BR.prototype._getTrio = function( numbers, index, max){
         single = this._getOnes( numbers[T2W.SINGLE_INDEX], index, true);
     }
     
-    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
-        hundred = ' ' + hundred;
-    }
-    
-    if( index === 0 && index+1 < max && !numbers[ T2W.HUNDRED_INDEX ] && (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX] )){
-        hundred = ' ';
-    }
+    var result = hundred + ten + single + radix;
     
     // Cas spécial pour "mil" (un mille = mil, pas "um mil")
     if( index === 1 && numbers[T2W.TEN_INDEX] === undefined && numbers[T2W.SINGLE_INDEX] === 1 && !numbers[T2W.HUNDRED_INDEX] ){
         return radix;
     }
     
-    return hundred + ten + single + radix;
+    // Ajouter des espaces entre les sections
+    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
+        // Vérifier si on doit ajouter "e" entre les sections
+        var needsConnector = false;
+        
+        // Ajouter "e" entre sections si la section actuelle (index 0) n'a pas de centaines
+        if( index === 0 && !numbers[ T2W.HUNDRED_INDEX ] && (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX] )){
+            needsConnector = true;
+        }
+        
+        // Ajouter "e" entre millions et milliers (index 1) - TOUJOURS
+        if( index === 1 ){
+            needsConnector = true;
+        }
+        
+        // AUSSI ajouter "e" entre milliers et centaines quand milliers ont des centaines (index 0 avec centaines)
+        if( index === 0 && numbers[ T2W.HUNDRED_INDEX ] ){
+            needsConnector = true;
+        }
+        
+        if( needsConnector ){
+            result = ' e ' + result;
+        } else {
+            result = ' ' + result;
+        }
+    }
+    
+    return result;
 };
 
 /**
@@ -1956,8 +1986,8 @@ T2W.PT_BR.prototype._getRadix = function( numbers, index ) {
         }
         
         if( index === 2 ){
-            // Gestion singulier/pluriel pour "milhão/milhões"
-            var total = numbers[T2W.HUNDRED_INDEX] * 100 + numbers[T2W.TEN_INDEX] * 10 + numbers[T2W.SINGLE_INDEX];
+            // Calculer le total pour cette section de 3 chiffres
+            var total = (numbers[T2W.HUNDRED_INDEX] || 0) * 100 + (numbers[T2W.TEN_INDEX] || 0) * 10 + (numbers[T2W.SINGLE_INDEX] || 0);
             if( total === 1 ){
                 radix = ' ' + T2W.PT_BR.DICTIONARY.radix[index][0]; // "milhão"
             } else {
@@ -2052,13 +2082,15 @@ T2W.PT_PT.prototype._getTrio = function( numbers, index, max){
         if(numbers[T2W.HUNDRED_INDEX] === 1){
             // 100 = "cem", 101-199 = "cento"
             hundred = (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) 
-                ? T2W.PT_PT.DICTIONARY.hundred[1] + ' '  // "cento "
-                : T2W.PT_PT.DICTIONARY.hundred[0];       // "cem"
+                ? T2W.PT_PT.DICTIONARY.hundred[1]  // "cento"
+                : T2W.PT_PT.DICTIONARY.hundred[0]; // "cem"
         } else {
             hundred = this._getOnes( numbers[T2W.HUNDRED_INDEX], index, false ) + ' ' + T2W.PT_PT.DICTIONARY.hundred[1];
-            if(numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]){
-                hundred += ' ';
-            }
+        }
+        
+        // Ajouter "e" après les centaines si il y a des dizaines ou unités
+        if(numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]){
+            hundred += ' e ';
         }
     }
     
@@ -2068,7 +2100,7 @@ T2W.PT_PT.prototype._getTrio = function( numbers, index, max){
     
     if( numbers[ T2W.TEN_INDEX ] >= 2 ){
         ten = numbers[T2W.SINGLE_INDEX] 
-            ? this._getTens( numbers[T2W.TEN_INDEX]) + T2W.PT_PT.DICTIONARY.delimiters[0] + this._getOnes( numbers[T2W.SINGLE_INDEX], index, true) 
+            ? this._getTens( numbers[T2W.TEN_INDEX]) + ' e ' + this._getOnes( numbers[T2W.SINGLE_INDEX], index, true) 
             : this._getTens( numbers[T2W.TEN_INDEX]);
     }
     
@@ -2076,20 +2108,41 @@ T2W.PT_PT.prototype._getTrio = function( numbers, index, max){
         single = this._getOnes( numbers[T2W.SINGLE_INDEX], index, true);
     }
     
-    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
-        hundred = ' ' + hundred;
-    }
+    var result = hundred + ten + single + radix;
     
-    if( index === 0 && index+1 < max && !numbers[ T2W.HUNDRED_INDEX ] && (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX] )){
-        hundred = ' ';
-    }
-    
-    // Cas spécial pour "mil" (um mil = mil, pas "um mil")
+    // Cas spécial pour "mil" (un mille = mil, pas "um mil")
     if( index === 1 && numbers[T2W.TEN_INDEX] === undefined && numbers[T2W.SINGLE_INDEX] === 1 && !numbers[T2W.HUNDRED_INDEX] ){
         return radix;
     }
     
-    return hundred + ten + single + radix;
+    // Ajouter des espaces entre les sections
+    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
+        // Vérifier si on doit ajouter "e" entre les sections
+        var needsConnector = false;
+        
+        // Ajouter "e" entre sections si la section actuelle (index 0) n'a pas de centaines
+        if( index === 0 && !numbers[ T2W.HUNDRED_INDEX ] && (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX] )){
+            needsConnector = true;
+        }
+        
+        // Ajouter "e" entre millions et milliers (index 1) - TOUJOURS
+        if( index === 1 ){
+            needsConnector = true;
+        }
+        
+        // AUSSI ajouter "e" entre milliers et centaines quand milliers ont des centaines (index 0 avec centaines)
+        if( index === 0 && numbers[ T2W.HUNDRED_INDEX ] ){
+            needsConnector = true;
+        }
+        
+        if( needsConnector ){
+            result = ' e ' + result;
+        } else {
+            result = ' ' + result;
+        }
+    }
+    
+    return result;
 };
 
 /**
@@ -2152,8 +2205,8 @@ T2W.PT_PT.prototype._getRadix = function( numbers, index ) {
         }
         
         if( index === 2 ){
-            // Gestion singulier/pluriel pour "milhão/milhões"
-            var total = numbers[T2W.HUNDRED_INDEX] * 100 + numbers[T2W.TEN_INDEX] * 10 + numbers[T2W.SINGLE_INDEX];
+            // Calculer le total pour cette section de 3 chiffres
+            var total = (numbers[T2W.HUNDRED_INDEX] || 0) * 100 + (numbers[T2W.TEN_INDEX] || 0) * 10 + (numbers[T2W.SINGLE_INDEX] || 0);
             if( total === 1 ){
                 radix = ' ' + T2W.PT_PT.DICTIONARY.radix[index][0]; // "milhão"
             } else {

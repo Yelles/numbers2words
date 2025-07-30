@@ -15,7 +15,7 @@ T2W.NL_NL.DICTIONARY = {
     teens           : ["tien", "elf", "twaalf", "dertien", "veertien", "vijftien", "zestien", "zeventien", "achttien", "negentien"],
     tens            : ["", "", "twintig", "dertig", "veertig", "vijftig", "zestig", "zeventig", "tachtig", "negentig"],
     hundred         : "honderd",
-    radix           : ["", "duizend", ["miljoen", "miljoen"]],
+    radix           : ["", "duizend", "miljoen"],
     delimiters      : ["", "en"]
 };
 
@@ -95,12 +95,8 @@ T2W.NL_NL.prototype._getTrio = function( numbers, index, max){
     
     if( numbers[ T2W.TEN_INDEX ] >= 2 ){
         if(numbers[T2W.SINGLE_INDEX]){
-            // En néerlandais: "drieëntwintig" (23 = trois-et-vingt)
-            if(numbers[T2W.SINGLE_INDEX] === 3 && numbers[T2W.TEN_INDEX] >= 2){
-                ten = "drie" + T2W.NL_NL.DICTIONARY.delimiters[1] + this._getTens( numbers[T2W.TEN_INDEX]);
-            } else {
-                ten = this._getOnes( numbers[T2W.SINGLE_INDEX] ) + T2W.NL_NL.DICTIONARY.delimiters[1] + this._getTens( numbers[T2W.TEN_INDEX]);
-            }
+            // En néerlandais: "drieëntwintig" -> "drieentwintig" (sans ë pour simplifier)
+            ten = this._getOnes( numbers[T2W.SINGLE_INDEX] ) + T2W.NL_NL.DICTIONARY.delimiters[1] + this._getTens( numbers[T2W.TEN_INDEX]);
         } else {
             ten = this._getTens( numbers[T2W.TEN_INDEX]);
         }
@@ -110,20 +106,30 @@ T2W.NL_NL.prototype._getTrio = function( numbers, index, max){
         single = this._getOnes( numbers[T2W.SINGLE_INDEX]);
     }
     
-    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
-        hundred = ' ' + hundred;
-    }
-    
-    if( index === 0 && index+1 < max && !numbers[ T2W.HUNDRED_INDEX ] && (numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX] )){
-        hundred = ' ';
-    }
+    var result = hundred + ten + single + radix;
     
     // Cas spécial pour "duizend" (un mille = duizend, pas "een duizend")
     if( index === 1 && numbers[T2W.TEN_INDEX] === undefined && numbers[T2W.SINGLE_INDEX] === 1 && !numbers[T2W.HUNDRED_INDEX] ){
         return radix;
     }
     
-    return hundred + ten + single + radix;
+    // En néerlandais : logique spéciale pour les espaces
+    if(index+1 < max && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX]) ){
+        if( index === 0 ){
+            // Unités : espace avant seulement si pas milliers directs
+            result = ' ' + result;
+        } else if( index === 1 ){
+            // Milliers : espace avant SEULEMENT s'il y a des millions
+            if( max > 2 ){
+                result = ' ' + result;
+            }
+        } else if( index === 2 ){
+            // Millions : espace avant
+            result = ' ' + result;
+        }
+    }
+    
+    return result;
 };
 
 /**
@@ -172,12 +178,13 @@ T2W.NL_NL.prototype._getRadix = function( numbers, index ) {
     
     if( index > 0 && (numbers[T2W.HUNDRED_INDEX] || numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX])){
         if( index === 1 ){
-            radix = ' ' + T2W.NL_NL.DICTIONARY.radix[index];
+            // Milliers : pas d'espace avant "duizend"
+            radix = T2W.NL_NL.DICTIONARY.radix[ index ];
         }
         
         if( index === 2 ){
-            // En néerlandais, "miljoen" ne change pas au pluriel dans ce contexte
-            radix = ' ' + T2W.NL_NL.DICTIONARY.radix[index][0];
+            // Millions : espace avant "miljoen" 
+            radix = ' ' + T2W.NL_NL.DICTIONARY.radix[index];
         }
     }
     
