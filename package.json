@@ -3,9 +3,9 @@
 	"description": "Numbers to words converter.",
 	"version": "1.6.0",
 	"bugs": {
-		"url": "https://github.com/Kibo/numbers2words/issues"
+		"url": "https://github.com/Yelles/numbers2words/issues"
 	},
-	"author": "Tomas Jurman <tomasjurman@gmail.com>",
+	"author": "Yelles",
 	"license": "MIT",
 	"keywords": [
 		"number",
@@ -15,7 +15,7 @@
 	"main": "./build/numbers2words.min",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Kibo/numbers2words.git"
+		"url": "https://github.com/Yelles/numbers2words.git"
 	},
 	"engines": {
 		"node": "*"
