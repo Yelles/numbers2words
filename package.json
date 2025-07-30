@@ -1,7 +1,7 @@
 {
 	"name": "numbers2words",
 	"description": "Numbers to words converter.",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"bugs": {
 		"url": "https://github.com/Kibo/numbers2words/issues"
 	},
@@ -21,11 +21,12 @@
 		"node": "*"
 	},
 	"scripts": {
-		"test": "grunt test"
+		"test": "grunt test",
+		"build": "grunt build"
 	},
 	"dependencies": {	
-	    "grunt": "^1.4.1",
-	    "grunt-cli": "^1.3.2",
+	    "grunt": "^1.6.1",
+	    "grunt-cli": "^1.4.3",
 	    "grunt-contrib-concat": "^2.1.0",
 	    "grunt-contrib-jshint": "^3.2.0",
 	    "grunt-contrib-qunit": "^8.0.1",

@@ -79,7 +79,7 @@ T2W.ID_ID.prototype._getTrio = function( numbers, index, max){
 	var radix = this._getRadix(numbers, index);
 	
 	if(numbers[T2W.HUNDRED_INDEX]){
-        hundredPrefix = numbers[T2W.HUNDRED_INDEX] > 1 ? this._getOnes( numbers[ T2W.HUNDRED_INDEX ] ) + " " : "se"
+        hundredPrefix = numbers[T2W.HUNDRED_INDEX] > 1 ? this._getOnes( numbers[ T2W.HUNDRED_INDEX ] ) + " " : "se";
 
 		hundred = numbers[T2W.TEN_INDEX] || numbers[T2W.SINGLE_INDEX] 
 			? hundredPrefix + T2W.ID_ID.DICTIONARY.hundred + ' '

@@ -139,9 +139,9 @@ T2W.ES_ES.prototype._getTrio = function( numbers, index, max){
 		return radix;
 	}
 	if( index > 0 && numbers[T2W.SINGLE_INDEX] === 1 && single == "uno")
-		single = "un"
+		single = "un";
 	if( index === 1 && numbers[T2W.SINGLE_INDEX] === 1)
-		single = ""
+		single = "";
 	if( index === 0 && numbers[T2W.TEN_INDEX] === 2 && numbers[T2W.SINGLE_INDEX] === 1)
 		return T2W.ES_ES.DICTIONARY.delimiters[0] + "veintiuno";
 	if( index > 0 && numbers[T2W.TEN_INDEX] === 2 && numbers[T2W.SINGLE_INDEX] === 1)

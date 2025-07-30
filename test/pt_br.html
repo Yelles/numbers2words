@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		<link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>	
+		<script type="text/javascript" src="../src/polyfill/polyfill.js"></script>
+		<script type="text/javascript" src="../src/numbers2words.js"></script>
+		<script type="text/javascript" src="../src/locales/pt_BR.js"></script>	
+		<script>
+			window.onload = function( ) {												
+				test( "toWords", function( ) {									
+					var translator = new T2W("PT_BR");
+					
+					equal( translator.toWords(0), "zero");	
+					equal( translator.toWords(1), "um");
+					equal( translator.toWords(2), "dois");
+					equal( translator.toWords(9), "nove");														
+					
+					equal( translator.toWords(10), "dez");	
+					equal( translator.toWords(11), "onze");
+					equal( translator.toWords(19), "dezenove");
+					equal( translator.toWords(20), "vinte");
+					equal( translator.toWords(21), "vinte e um");
+					equal( translator.toWords(31), "trinta e um");
+					equal( translator.toWords(51), "cinquenta e um");
+					equal( translator.toWords(38), "trinta e oito");
+					equal( translator.toWords(47), "quarenta e sete");
+					equal( translator.toWords(99), "noventa e nove");
+					
+					equal( translator.toWords(100), "cem");
+					equal( translator.toWords(101), "cento e um");
+					equal( translator.toWords(109), "cento e nove");
+					equal( translator.toWords(110), "cento e dez");
+					equal( translator.toWords(111), "cento e onze");
+					equal( translator.toWords(119), "cento e dezenove");
+					equal( translator.toWords(199), "cento e noventa e nove");
+					equal( translator.toWords(200), "dois cento");
+					equal( translator.toWords(300), "três cento");
+					equal( translator.toWords(999), "nove cento e noventa e nove");
+					
+					equal( translator.toWords(1000), "mil");
+					equal( translator.toWords(1001), "mil e um");
+					equal( translator.toWords(1011), "mil e onze");
+					equal( translator.toWords(1021), "mil e vinte e um");	
+					equal( translator.toWords(2019), "dois mil e dezenove");	
+					equal( translator.toWords(8048), "oito mil e quarenta e oito");			
+					equal( translator.toWords(9000), "nove mil");
+					equal( translator.toWords(9001), "nove mil e um");
+					equal( translator.toWords(9011), "nove mil e onze");
+					equal( translator.toWords(9021), "nove mil e vinte e um");	
+					equal( translator.toWords(9999), "nove mil e nove cento e noventa e nove");
+					
+					equal( translator.toWords(11000), "onze mil");
+					equal( translator.toWords(11001), "onze mil e um");
+					equal( translator.toWords(11011), "onze mil e onze");
+					equal( translator.toWords(11021), "onze mil e vinte e um");
+					equal( translator.toWords(12002), "doze mil e dois");					
+					equal( translator.toWords(99000), "noventa e nove mil");
+					equal( translator.toWords(99001), "noventa e nove mil e um");
+					equal( translator.toWords(99011), "noventa e nove mil e onze");
+					equal( translator.toWords(99021), "noventa e nove mil e vinte e um");
+					
+					equal( translator.toWords(1000000), "um milhão");
+					equal( translator.toWords(1000001), "um milhão e um");
+					equal( translator.toWords(1000011), "um milhão e onze");
+					equal( translator.toWords(1000021), "um milhão e vinte e um");
+					equal( translator.toWords(1010000), "um milhão e dez mil");
+					equal( translator.toWords(1010001), "um milhão e dez mil e um");					
+					equal( translator.toWords(1021001), "um milhão e vinte e um mil e um");					
+					equal( translator.toWords(1110000), "um milhão e cento e dez mil");
+					equal( translator.toWords(2000040), "dois milhões e quarenta");
+					equal( translator.toWords(11000000), "onze milhões");
+					equal( translator.toWords(21000000), "vinte e um milhões");
+					equal( translator.toWords(999999999), "nove cento e noventa e nove milhões e nove cento e noventa e nove mil e nove cento e noventa e nove");														
+				});
+			};
+		</script>
+	</head>
+	<body>
+		<h1 id="qunit-header">PT_BR Locale</h1>
+		<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
+		<div id="qunit-fixture">
+			test markup, will be hidden
+		</div>
+	</body>
+</html>
