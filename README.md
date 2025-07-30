@@ -24,6 +24,7 @@ translator.toWords(1234)
  - pt_BR	(0...999999999)
  - pt_PT	(0...999999999)
  - nl_NL	(0...999999999)
+ - ru_RU	(0...999999999)
  
 **You can implement your locale vocabulary**. For additional locale send pull request with locale file + tests.
  
